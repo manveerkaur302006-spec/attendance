@@ -1,0 +1,4 @@
+node_modules/
+attendance-frontend/node_modules/
+attendance-system/node_modules/
+.env
