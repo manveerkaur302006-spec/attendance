@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import "./App.css";
 import ComplaintSection from "./ComplaintSection";
 import ClassSection from "./ClassSection";
 import ClassSummary from "./ClassSummary";
 import AttendanceSummary from "./AttendanceSummary";
-
-const API = "http://localhost:5000";
+import { API } from "./api";
 
 function App() {
   const [selectedClass, setSelectedClass] = useState("");
@@ -18,11 +17,7 @@ function App() {
 
   const today = new Date().toISOString().split("T")[0];
 
-  useEffect(() => {
-    fetchStudents();
-  }, [selectedClass]);
-
-  const fetchStudents = async () => {
+  const fetchStudents = useCallback(async () => {
     if (!selectedClass) return;
 
     const res = await axios.get(
@@ -30,7 +25,11 @@ function App() {
     );
 
     setStudents(res.data);
-  };
+  }, [selectedClass]);
+
+  useEffect(() => {
+    fetchStudents();
+  }, [fetchStudents]);
 
   const addStudent = async () => {
     if (!name || !rollNo || !selectedClass) {
@@ -185,4 +184,3 @@ function App() {
 }
 
 export default App;
-

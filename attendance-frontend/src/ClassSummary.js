@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-
-const API = "http://localhost:5000";
+import { API } from "./api";
 
 function ClassSummary({ selectedClass }) {
   const [summary, setSummary] = useState(null);

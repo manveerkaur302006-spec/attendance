@@ -32,34 +32,14 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+}));
 app.use(express.json());
-
-// Connect to Local MongoDB
-mongoose.connect("mongodb://127.0.0.1:27017/attendanceDB")
-  .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.log(err));
-
-//   mongoose.connection.once("open", async () => {
-//   try {
-//     await mongoose.connection.dropCollection("students");
-//     console.log("Old students collection deleted");
-//   } catch (err) {
-//     console.log("Collection not found (first time)");
-//   }
-// });
-
-// mongoose.connection.once("open", async () => {
-//   try {
-//     await mongoose.connection.db.dropDatabase();
-//     console.log("🔥 Entire Database Deleted Successfully");
-//   } catch (err) {
-//     console.log("Error deleting database:", err);
-//   }
-// });
 
 // Routes
 app.use("/api/students", require("./routes/studentRoutes"));
@@ -67,8 +47,21 @@ app.use("/api/attendance", require("./routes/attendanceRoutes"));
 app.use("/api/complaints", require("./routes/complaintRoutes"));
 app.use("/api/classes", require("./routes/classRoutes"));
 
-const PORT = process.env.PORT || 5000;
+async function startServer() {
+  if (!process.env.MONGO_URI) {
+    throw new Error("MONGO_URI environment variable is required");
+  }
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`); 
+  await mongoose.connect(process.env.MONGO_URI);
+  console.log("MongoDB Connected");
+
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+startServer().catch((err) => {
+  console.error("Failed to start server:", err);
+  process.exit(1);
 });
